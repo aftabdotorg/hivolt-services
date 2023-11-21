@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     phone: {
-      type: Number,
+      type: String,
       required: true,
     },
     password: {
@@ -30,6 +30,8 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+// ! storing hashed password - METHOD 2:
+
 userSchema.pre("save", async function (next) {
   const user = this;
   if (!user.isModified("password")) {
@@ -45,7 +47,16 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// * instance
+// ! validating password - METHOD 2:
+userSchema.methods.validatePassword = async function (password) {
+  try {
+    return bcrypt.compare(password, this.password);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// ! generating token
 userSchema.methods.generateToken = async () => {
   try {
     return jwt.sign(

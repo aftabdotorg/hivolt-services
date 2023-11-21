@@ -14,6 +14,13 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "user already exists" });
     }
 
+    /**
+     * ! storing hashed password - METHOD 1:
+     * * const saltRounds = 10;
+     * * const const hashedpass = await bcrypt.hash(password, saltRounds)
+     * ? write { pasword : hashedpass } if using above method
+     */
+
     const newUser = await User.create({
       username,
       email,
@@ -42,8 +49,19 @@ const login = async (req, res) => {
       });
     }
 
-    const validatePass = await bcrypt.compare(password, userExists.password);
-    if (validatePass) {
+    /**
+     * ! instance methods defined in userModel:
+     * ? generateToken()
+     * ? validatePass()
+     */
+
+    // ? validating password METHOD 1:
+    // const isPassValid = await bcrypt.compare(password, userExists.password);
+
+    // ? validating password using instance method METHOD 2:
+    const isPassValid = await userExists.validatePassword(password);
+
+    if (isPassValid) {
       return res.status(200).json({
         message: "login successful",
         userID: userExists._id.toString(),
