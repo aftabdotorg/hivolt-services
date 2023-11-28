@@ -34,7 +34,8 @@ const register = async (req, res) => {
       created: true,
     });
   } catch (error) {
-    res.status(500).json("internal server error");
+    // res.status(500).json("internal server error");
+    next(error);
   }
 };
 
@@ -68,12 +69,14 @@ const login = async (req, res) => {
         token: await userExists.generateToken(),
       });
     } else {
+      
       return res.status(401).json({
         message: "invalid credentials",
       });
     }
   } catch (error) {
-    return res.status(500).json("internal server error");
+    // return res.status(500).json("internal server error");
+    next(error)
   }
 };
 
